@@ -8,10 +8,29 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jpg6</groupId>
     <artifactId>gulimall-common</artifactId>
-    <name>Archetype - gulimall-common</name>
+    <name>gulimall-common</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>
+
+        <!--spring cloud alibaba-->
+
+
+
+        <!--服务发现-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- 配置中心, 做配置管理-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+
+
 
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -72,5 +91,17 @@
         </dependency>
 
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2021.0.4.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
