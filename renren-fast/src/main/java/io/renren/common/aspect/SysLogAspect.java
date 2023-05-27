@@ -73,7 +73,7 @@ public class SysLogAspect {
 		//请求的方法名
 		String className = joinPoint.getTarget().getClass().getName();
 		String methodName = signature.getName();
-		sysLog.setMethod(className + "." + methodName + "()");
+		sysLog  .setMethod(className + "." + methodName + "()");
 
 		//请求的参数
 		Object[] args = joinPoint.getArgs();

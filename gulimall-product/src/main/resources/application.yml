@@ -11,6 +11,10 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+
+
+
+
 mybatis-plus:
   # mapper-locations: classpath*:/mapper/**/*.xml
 
@@ -18,6 +22,14 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+      logic-delete-field: 0
+      logic-not-delete-value: 1
+
+
 
 server:
   port: 9988
+
+logging:
+  level:
+    com.jpg6.gulimall.product: debug

@@ -18,11 +18,11 @@
     </properties>
     <dependencies>
 
-<!--        <dependency>-->
-<!--            <groupId>com.jpg6</groupId>-->
-<!--            <artifactId>gulimall-common</artifactId>-->
-<!--            <version>1.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.jpg6</groupId>
+            <artifactId>gulimall-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <!--网关依赖-->
 
