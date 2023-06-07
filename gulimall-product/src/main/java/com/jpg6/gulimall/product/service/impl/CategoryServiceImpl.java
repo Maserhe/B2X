@@ -1,11 +1,10 @@
 package com.jpg6.gulimall.product.service.impl;
 
+import com.mysql.cj.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -32,6 +31,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
         return new PageUtils(page);
     }
+
+
+
 
     /**
      * 删除所有选中
@@ -65,6 +67,18 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return level1Menus;
     }
 
+
+    /**
+     *
+     * @param catelogId
+     */
+    public Long[] findCategoryPath(Long catelogId) {
+        List<Long> paths = new ArrayList<>();
+        findParentPath(catelogId, paths);
+        Collections.reverse(paths);
+        return paths.toArray(new Long[paths.size()]);
+    }
+
     /**
      * 递归查找，所有
      * @param root
@@ -82,5 +96,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         }).collect(Collectors.toList());
 
         return children;
+    }
+
+    private List<Long> findParentPath(Long categoryId, List<Long> paths) {
+        CategoryEntity nowNode = this.getById(categoryId);
+        paths.add(categoryId);
+        if (nowNode.getParentCid() != 0) {
+            findParentPath(nowNode.getParentCid(), paths);
+        }
+        return paths;
     }
 }
