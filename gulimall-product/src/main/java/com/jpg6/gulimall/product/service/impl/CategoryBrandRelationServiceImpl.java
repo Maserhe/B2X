@@ -5,9 +5,14 @@ import com.jpg6.gulimall.product.dao.BrandDao;
 import com.jpg6.gulimall.product.dao.CategoryDao;
 import com.jpg6.gulimall.product.entity.BrandEntity;
 import com.jpg6.gulimall.product.entity.CategoryEntity;
+import com.jpg6.gulimall.product.vo.BrandVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -85,5 +90,30 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
         // 保存
         baseMapper.insert(categoryBrandRelation);
+    }
+
+
+    /**
+     * 查询某个分类下的所有品牌
+     * @param catId
+     * @return
+     */
+    @Override
+    public List<BrandEntity> getBrandsByCatId(Long catId) {
+
+        List<CategoryBrandRelationEntity> relationEntities = baseMapper.selectList(new QueryWrapper<CategoryBrandRelationEntity>().eq("catelog_id", catId));
+        List<Long> brandIds = relationEntities.stream().map(t -> t.getBrandId()).collect(Collectors.toList());
+
+        // 查找所有品牌
+        List<BrandEntity> brandEntities = brandDao.selectBatchIds(brandIds);
+
+//        List<BrandVo> brandVos = brandEntities.stream().map(t -> {
+//            BrandVo brandVo = new BrandVo();
+//            brandVo.setBrandName(t.getName());
+//            brandVo.setBrandId(t.getBrandId());
+//            return brandVo;
+//        }).collect(Collectors.toList());
+
+        return brandEntities;
     }
 }

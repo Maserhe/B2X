@@ -8,6 +8,7 @@ import com.jpg6.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.jpg6.gulimall.product.entity.AttrEntity;
 import com.jpg6.gulimall.product.service.AttrService;
 import com.jpg6.gulimall.product.vo.AttrGroupRelationVo;
+import com.jpg6.gulimall.product.vo.AttrGroupWithAttrsVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
 
     @Autowired
-    private AttrDao attrDao;
+    private AttrService attrService;
 
 
     @Override
@@ -98,4 +99,22 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     }
 
+    @Override
+    public List<AttrGroupWithAttrsVo> getAttrGroupWithAttrs(Long catelogId) {
+
+        //1, 查出所有属性分组
+        List<AttrGroupEntity> groupEntities = this.list(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId));
+
+        List<AttrGroupWithAttrsVo> attrGroupWithAttrsVos = groupEntities.stream().map(t -> {
+            AttrGroupWithAttrsVo attrGroupWithAttrsVo = new AttrGroupWithAttrsVo();
+            BeanUtils.copyProperties(t, attrGroupWithAttrsVo);
+
+            //2， 查出每个属性分组的 所有属性
+            List<AttrEntity> attrs = attrService.getRealtionAttr(t.getAttrGroupId());
+            attrGroupWithAttrsVo.setAttrs(attrs);
+            return attrGroupWithAttrsVo;
+        }).collect(Collectors.toList());
+
+        return attrGroupWithAttrsVos;
+    }
 }

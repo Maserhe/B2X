@@ -10,6 +10,7 @@ import com.jpg6.gulimall.product.service.AttrAttrgroupRelationService;
 import com.jpg6.gulimall.product.service.AttrService;
 import com.jpg6.gulimall.product.service.CategoryService;
 import com.jpg6.gulimall.product.vo.AttrGroupRelationVo;
+import com.jpg6.gulimall.product.vo.AttrGroupWithAttrsVo;
 import com.mysql.cj.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,22 @@ public class AttrGroupController {
         List<AttrEntity> entities = attrService.getRealtionAttr(attrgroupId);
         return R.ok().put("data", entities);
     }
+
+
+    /**
+     * 查询某个三级分类下 的所有 属性分组
+     * @param catelogId
+     * @return
+     */
+    @GetMapping("/{catelogId}/withattr")
+    public R getAttrGroupWithAttrs(@PathVariable("catelogId") Long catelogId) {
+
+        List<AttrGroupWithAttrsVo> vos =  attrGroupService.getAttrGroupWithAttrs(catelogId);
+
+        return R.ok().put("data", vos);
+    }
+
+
 
     /**
      * 关联关系的删除
