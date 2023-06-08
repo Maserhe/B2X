@@ -12,4 +12,13 @@
     </resultMap>
 
 
+    <delete id="deleBatchRelation" parameterType="com.jpg6.gulimall.product.entity.AttrAttrgroupRelationEntity">
+        DELETE FROM pms_attr_attrgroup_relation WHERE
+        <foreach collection="groupEntities" item="entity" separator=" OR " >
+            (attr_id = #{entity.attrId} AND attr_group_id = #{entity.attrGroupId})
+        </foreach>
+
+    </delete>
+
+
 </mapper>

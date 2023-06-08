@@ -3,6 +3,7 @@ package com.jpg6.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jpg6.common.utils.PageUtils;
 import com.jpg6.gulimall.product.entity.AttrGroupEntity;
+import com.jpg6.gulimall.product.vo.AttrGroupRelationVo;
 
 import java.util.Map;
 
@@ -18,5 +19,8 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     PageUtils queryPage(Map<String, Object> params, Long catelogId);
+
+    void deleRelation(AttrGroupRelationVo[] relationVos);
+
 }
 

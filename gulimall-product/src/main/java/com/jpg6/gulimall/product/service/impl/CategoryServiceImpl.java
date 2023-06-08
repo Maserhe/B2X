@@ -1,6 +1,7 @@
 package com.jpg6.gulimall.product.service.impl;
 
-import com.mysql.cj.log.Log;
+import com.jpg6.gulimall.product.entity.CategoryBrandRelationEntity;
+import com.jpg6.gulimall.product.service.CategoryBrandRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,15 @@ import com.jpg6.common.utils.Query;
 import com.jpg6.gulimall.product.dao.CategoryDao;
 import com.jpg6.gulimall.product.entity.CategoryEntity;
 import com.jpg6.gulimall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+
+    @Autowired
+    private CategoryBrandRelationService categoryBrandRelationService;
 
 
     @Override
@@ -67,6 +73,17 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return level1Menus;
     }
 
+    /**
+     * 更新 自己包括相关的 表
+     * @param category
+     */
+    @Override
+    @Transactional
+    public void updateDetail(CategoryEntity category) {
+        updateById(category);
+        // 更新关联表
+        categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
+    }
 
     /**
      *
