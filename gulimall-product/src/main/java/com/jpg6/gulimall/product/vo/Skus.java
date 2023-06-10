@@ -2,6 +2,7 @@
   * Copyright 2023 bejson.com 
   */
 package com.jpg6.gulimall.product.vo;
+import com.jpg6.common.to.MemberPrice;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,8 +29,8 @@ public class Skus {
     private String skuSubtitle;
     private List<Images> images;
     private List<String> descar;
-    private BigDecimal fullCount;
-    private double discount;
+    private Integer fullCount;
+    private BigDecimal discount;
     private int countStatus;
     private BigDecimal fullPrice;
     private BigDecimal reducePrice;

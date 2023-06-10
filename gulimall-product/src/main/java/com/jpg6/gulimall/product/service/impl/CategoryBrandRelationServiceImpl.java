@@ -9,6 +9,7 @@ import com.jpg6.gulimall.product.vo.BrandVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,6 +104,9 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
         List<CategoryBrandRelationEntity> relationEntities = baseMapper.selectList(new QueryWrapper<CategoryBrandRelationEntity>().eq("catelog_id", catId));
         List<Long> brandIds = relationEntities.stream().map(t -> t.getBrandId()).collect(Collectors.toList());
+
+
+        if (brandIds == null || brandIds.size() == 0) return new ArrayList<BrandEntity>();
 
         // 查找所有品牌
         List<BrandEntity> brandEntities = brandDao.selectBatchIds(brandIds);

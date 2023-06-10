@@ -27,6 +27,7 @@ public class SpuSaveVo {
     private Long brandId;
     private Long catalogId;
 
+
     private BigDecimal weight;
     private int publishStatus;
     private List<String> decript;

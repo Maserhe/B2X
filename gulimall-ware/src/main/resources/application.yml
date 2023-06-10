@@ -23,4 +23,4 @@ mybatis-plus:
       id-type: auto
 
 server:
-  port: 7777
+  port: 6666
