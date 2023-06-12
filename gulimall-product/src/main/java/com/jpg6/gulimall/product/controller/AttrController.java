@@ -1,9 +1,12 @@
 package com.jpg6.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.jpg6.gulimall.product.entity.ProductAttrValueEntity;
+import com.jpg6.gulimall.product.service.ProductAttrValueService;
 import com.jpg6.gulimall.product.vo.AttrRespVo;
 import com.jpg6.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ public class AttrController {
     @Autowired
     private AttrService attrService;
 
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
+
 
 //    /**
 //     * 分页查询
@@ -43,6 +49,14 @@ public class AttrController {
 //        return R.ok().put("page", page);
 //    }
 
+
+    @RequestMapping("/base/listforspu/{spuId}")
+    public R listForSpu(@PathVariable("spuId") Long spuId) {
+
+        List<ProductAttrValueEntity> data =  productAttrValueService.baseAttrListForSpu(spuId);
+
+        return R.ok().put("data", data);
+    }
 
 
     /**
@@ -107,6 +121,21 @@ public class AttrController {
         attrService.updateAttr(attrVo);
         return R.ok();
     }
+
+
+
+    /**
+     * 修改
+     */
+    @PostMapping("/update/{spuId}")
+    // @RequiresPermissions("product:attr:update")
+    public R updateAttr(@PathVariable("spuId") Long spuId, @RequestBody List<ProductAttrValueEntity> entities){
+        
+        productAttrValueService.updateSpuAttr(spuId, entities);
+
+        return R.ok();
+    }
+
 
     /**
      * 删除
