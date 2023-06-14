@@ -130,7 +130,7 @@ public class AttrController {
     @PostMapping("/update/{spuId}")
     // @RequiresPermissions("product:attr:update")
     public R updateAttr(@PathVariable("spuId") Long spuId, @RequestBody List<ProductAttrValueEntity> entities){
-        
+
         productAttrValueService.updateSpuAttr(spuId, entities);
 
         return R.ok();
