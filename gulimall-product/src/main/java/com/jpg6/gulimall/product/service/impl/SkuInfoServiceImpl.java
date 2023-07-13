@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -74,5 +75,17 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+
+    /**
+     * 查询所哟 sku 具体商品
+     * @param spuId
+     * @return
+     */
+    @Override
+    public List<SkuInfoEntity> getSkusById(Long spuId) {
+        List<SkuInfoEntity> skuInfoEntities = this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
+        return skuInfoEntities;
     }
 }

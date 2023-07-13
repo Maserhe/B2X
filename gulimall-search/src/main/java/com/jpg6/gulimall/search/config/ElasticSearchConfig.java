@@ -23,7 +23,12 @@ public class ElasticSearchConfig {
     }
 
 
-    public static RequestOptions COMMON = RequestOptions.DEFAULT;
+    public static RequestOptions COMMON_OPTION;
+
+    static {
+        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+        COMMON_OPTION = builder.build();
+    }
 
 
 }

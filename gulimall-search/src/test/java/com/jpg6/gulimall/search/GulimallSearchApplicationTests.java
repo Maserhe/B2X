@@ -5,9 +5,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 @SpringBootTest
 class GulimallSearchApplicationTests {
@@ -33,7 +30,7 @@ class GulimallSearchApplicationTests {
         IndexRequest request = new IndexRequest("users");
         request.source("name", "123").id("1");
 
-        IndexResponse response = restHighLevelClient.index(request, ElasticSearchConfig.COMMON);
+        IndexResponse response = restHighLevelClient.index(request, ElasticSearchConfig.COMMON_OPTION);
 
         System.out.println(response);
     }
@@ -54,7 +51,7 @@ class GulimallSearchApplicationTests {
 
         request.source(sourceBuilder);
 
-        SearchResponse searchResponse = restHighLevelClient.search(request, ElasticSearchConfig.COMMON);
+        SearchResponse searchResponse = restHighLevelClient.search(request, ElasticSearchConfig.COMMON_OPTION);
 
         System.out.println(sourceBuilder.toString());
         System.out.println(searchResponse);

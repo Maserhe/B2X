@@ -1,19 +1,27 @@
 package com.jpg6.gulimall.product.service.impl;
 
+import com.jpg6.common.constant.ProductConstant;
 import com.jpg6.common.to.SkuReductionTo;
 import com.jpg6.common.to.SpuBoundTo;
+import com.jpg6.common.to.es.SkuEsModel;
+import com.jpg6.common.utils.FeignUtil;
 import com.jpg6.common.utils.R;
+import com.jpg6.common.vo.SkuHasStockVo;
 import com.jpg6.gulimall.product.entity.*;
 import com.jpg6.gulimall.product.feign.CouponFeignService;
+import com.jpg6.gulimall.product.feign.SearchFeignService;
+import com.jpg6.gulimall.product.feign.WareFeignService;
 import com.jpg6.gulimall.product.service.*;
 import com.jpg6.gulimall.product.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.openfeign.support.FeignUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +43,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
 
     @Autowired
+    private SearchFeignService searchFeignService;
+
+    @Autowired
     private SpuInfoDescService spuInfoDescService;
 
 
@@ -43,6 +54,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private AttrService attrService;
+
+
+    @Autowired
+    private ProductAttrValueService attrValueService;
 
 
     @Autowired
@@ -63,6 +78,18 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+
+    @Autowired
+    private WareFeignService wareFeignService;
+
+
+    @Autowired
+    private BrandService brandService;
+
+
+    @Autowired
+    private CategoryService categoryService;
 
 
     @Override
@@ -189,17 +216,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                         log.error("远程保存sku 优惠信息失败！！！！！");
                     }
                 }
-
-
-
             });
         }
-
-
-
-
-
-
 
 
     }
@@ -247,5 +265,93 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 商品上架
+     * @param spuId
+     */
+    @Override
+    public void up(Long spuId) {
+
+        // 需要上架多个商品
+        // 1, 组装我们需要的数据
+        // 2, 查询当前spuId对应的sku信息，
+        List<SkuInfoEntity> skus = skuInfoService.getSkusById(spuId);
+        // 3， 封装每一个 skuEsModel
+        // 查询一次attr 就行,规格属性， 所有的sku 规格属性是一样的
+        List<ProductAttrValueEntity> baseAttrs = attrValueService.baseAttrListForSpu(spuId);
+        // 选出检索信息 sku 的 attr 规格属性
+        List<Long> attrIds = baseAttrs.stream().map(item -> {
+            return item.getAttrId();
+        }).collect(Collectors.toList());
+
+        // 指定的所有属性集合中，选出检索属性
+        List<Long> searAttrIds = attrService.selectAttrIds(attrIds);
+
+        final List<SkuEsModel.Attrs> attrsList = baseAttrs.stream().filter(item -> {
+            Long attrId = item.getAttrId();
+            return searAttrIds.contains(attrId);
+        }).map(item -> {
+            SkuEsModel.Attrs newAttr = new SkuEsModel.Attrs();
+            newAttr.setAttrId(item.getAttrId());
+            newAttr.setAttrName(item.getAttrName());
+            newAttr.setAttrValue(item.getAttrValue());
+            return newAttr;
+        }).collect(Collectors.toList());
+
+
+        Map<Long, Boolean> stockMap = null;
+
+        try {
+            // 远程服务调用
+            R r = wareFeignService.getSkuHasStock(skus.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList()));
+
+            List<SkuHasStockVo> vos = FeignUtil.formatListClass(r, SkuHasStockVo.class);
+
+            // List<SkuHasStockVo> vos = (List<SkuHasStockVo>) r.get("data");
+            stockMap = vos.stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, SkuHasStockVo::getHasStock));
+        } catch (Exception e) {
+            log.error("库存服务远程调用失败！！！");
+        }
+
+        Map<Long, Boolean> finalStockMap = stockMap;
+
+        List<SkuEsModel> esModels = skus.stream().map(item -> {
+            SkuEsModel esModel = new SkuEsModel();
+            BeanUtils.copyProperties(item, esModel);
+            esModel.setSkuPrice(item.getPrice());
+            esModel.setSkuImg(item.getSkuDefaultImg());
+
+            //TODO 设置库存,库存服务处理，只查询是否有
+
+            esModel.setHasStock(finalStockMap == null? false: finalStockMap.get(item.getSkuId()));
+            //TODO 热度评分
+            esModel.setHotScore(0L);
+            BrandEntity brandEntity = brandService.getById(item.getBrandId());
+            esModel.setBrandImg(brandEntity.getLogo());
+            esModel.setBrandName(brandEntity.getName());
+            // 设置分类
+            CategoryEntity categoryEntity = categoryService.getById(item.getCatalogId());
+            esModel.setCatalogName(categoryEntity.getName());
+            // 设置规格属性
+            esModel.setAttrs(attrsList);
+
+            return esModel;
+        }).collect(Collectors.toList());
+
+        // TODO 5 将数据发送给es 服务
+        // System.out.println(esModels);
+        R r = searchFeignService.productStatusUp(esModels);
+
+        if (r.getCode() == 0) {
+            //  远程调用成功
+            //TODO 6 修改spu 状态
+            baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode());
+        } else {
+            // 远程 调用失败
+            //TODO 7 接口幂等性， 重试机制。
+        }
+
     }
 }

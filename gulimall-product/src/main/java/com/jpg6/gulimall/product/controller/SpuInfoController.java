@@ -3,7 +3,6 @@ package com.jpg6.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
-// import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.jpg6.gulimall.product.vo.SpuSaveVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +30,19 @@ import com.jpg6.common.utils.R;
 public class SpuInfoController {
     @Autowired
     private SpuInfoService spuInfoService;
+
+
+    /**
+     * 商品上架
+     */
+    @RequestMapping("/{spuId}/up")
+    // @RequiresPermissions("product:spuinfo:list")
+    public R spuUp(@PathVariable("spuId")Long spuId){
+
+        spuInfoService.up(spuId);
+        return R.ok();
+    }
+
 
     /**
      * 列表
