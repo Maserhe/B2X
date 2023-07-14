@@ -12,8 +12,11 @@ import com.jpg6.gulimall.product.entity.CategoryEntity;
 import com.jpg6.gulimall.product.service.BrandService;
 import com.jpg6.gulimall.product.service.CategoryService;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -21,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.UUID;
 
 
 @SpringBootTest
@@ -31,6 +35,27 @@ class GulimallProductApplicationTests {
 
     @Autowired
     CategoryService categoryService;
+
+    @Autowired
+    StringRedisTemplate redisTemplate;
+
+
+    @Autowired
+    RedissonClient redissonClient;
+
+
+    @Test
+    void testRedissionClient() {
+        System.out.println(redissonClient);
+    }
+
+    @Test
+    void testRedis() {
+
+        ValueOperations<String, String> ops = redisTemplate.opsForValue();
+        ops.set("hello", "world" + UUID.randomUUID());
+
+    }
 
     @Test
     void contextLoads() {

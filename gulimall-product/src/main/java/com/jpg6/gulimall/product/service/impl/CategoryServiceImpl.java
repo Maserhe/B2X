@@ -1,8 +1,14 @@
 package com.jpg6.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.jpg6.gulimall.product.entity.CategoryBrandRelationEntity;
 import com.jpg6.gulimall.product.service.CategoryBrandRelationService;
+import com.jpg6.gulimall.product.vo.Catelog2Vo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,6 +32,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
 
     @Override
@@ -122,5 +132,88 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             findParentPath(nowNode.getParentCid(), paths);
         }
         return paths;
+    }
+
+    /**
+     * 查出所有1 级分类
+     * @return
+     */
+    @Override
+    public List<CategoryEntity> getLevel1Categorys() {
+        List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+        return categoryEntities;
+    }
+
+    /**
+     * 从数据库查询
+     * @return
+     */
+    public Map<String, List<Catelog2Vo>> getCatalogJsonFromDb() {
+
+        Map<String, List<Catelog2Vo>> catalogJson = null;
+
+        synchronized (this) {
+            // 0, 加锁后，先查缓存
+            String catalogJSON = redisTemplate.opsForValue().get("catalogJSON");
+            if (!StringUtils.isEmpty(catalogJSON)) {
+                Map<String, List<Catelog2Vo>> result = JSON.parseObject(catalogJSON, new TypeReference<Map<String, List<Catelog2Vo>>>(){});
+                return result;
+            }
+
+            System.out.println("从数据库查询数据 ！！！ ");
+
+            // 1, 查出所有1级分类
+            List<CategoryEntity> level1Categorys  = getLevel1Categorys();
+            // 2, 封装数据
+            catalogJson = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+                // 1, 每一个的一级分类，查到这个一级分类的二级分类
+                List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", v.getCatId()));
+                List<Catelog2Vo> catelog2Vos = null;
+
+                if (categoryEntities != null) {
+                    catelog2Vos = categoryEntities.stream().map(l2 -> {
+                        Catelog2Vo catelog2Vo = new Catelog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName());
+
+                        List<CategoryEntity> level3Catelog = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", l2.getCatId()));
+
+                        if (level3Catelog != null) {
+                            // 封装成指定格式
+                            List<Catelog2Vo.Catalog3Vo> catalog3VoList = level3Catelog.stream().map(l3 -> {
+                                Catelog2Vo.Catalog3Vo catalog3Vo = new Catelog2Vo.Catalog3Vo(l2.getCatId().toString(), l3.getCatId().toString(), l3.getName());
+                                return catalog3Vo;
+                            }).collect(Collectors.toList());
+
+                            catelog2Vo.setCatalog3List(catalog3VoList);
+                        }
+
+                        return catelog2Vo;
+                    }).collect(Collectors.toList());
+                }
+                return catelog2Vos;
+            }));
+        }
+
+        return catalogJson;
+    }
+
+
+
+    @Override
+    public Map<String, List<Catelog2Vo>> getCatalogJson() {
+
+        String catalogJSON = redisTemplate.opsForValue().get("catalogJSON");
+
+        if (StringUtils.isEmpty(catalogJSON)) {
+            System.out.println("缓存未命中！！！ ==== ");
+            Map<String, List<Catelog2Vo>> catalogJsonFromDb = getCatalogJsonFromDb();
+            // 数据放入缓存中
+            redisTemplate.opsForValue().set("catalogJSON", JSON.toJSONString(catalogJsonFromDb));;
+            return catalogJsonFromDb;
+        }
+        // 从缓存中 拿数据
+
+        System.out.println("缓存命中！！！ ==== ");
+        Map<String, List<Catelog2Vo>> result = JSON.parseObject(catalogJSON, new TypeReference<Map<String, List<Catelog2Vo>>>(){});
+        return result;
     }
 }
