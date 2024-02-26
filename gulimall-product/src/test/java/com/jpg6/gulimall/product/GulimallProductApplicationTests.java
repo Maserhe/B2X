@@ -6,11 +6,16 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
+import com.jpg6.gulimall.product.dao.AttrGroupDao;
 import com.jpg6.gulimall.product.dao.BrandDao;
 import com.jpg6.gulimall.product.entity.BrandEntity;
 import com.jpg6.gulimall.product.entity.CategoryEntity;
 import com.jpg6.gulimall.product.service.BrandService;
 import com.jpg6.gulimall.product.service.CategoryService;
+import com.jpg6.gulimall.product.service.SkuSaleAttrValueService;
+import com.jpg6.gulimall.product.vo.SkuItemSaleAttrVo;
+import com.jpg6.gulimall.product.vo.SkuItemVo;
+import com.jpg6.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -85,6 +91,22 @@ class GulimallProductApplicationTests {
         System.out.println(Arrays.asList(path));
 
 
+
+    }
+
+    @Autowired
+    private AttrGroupDao attrGroupDao;
+
+    @Autowired
+    private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Test
+    public void getTestGroupAttr() {
+//        List<SpuItemAttrGroupVo> group = attrGroupDao.getAttrGroupWithAttrsBySpuId(13L, 225L);
+//
+//        System.out.println(group.toString());
+        List<SkuItemSaleAttrVo> saleAttrsBySpuId = skuSaleAttrValueService.getSaleAttrsBySpuId(13L);
+        System.out.println(saleAttrsBySpuId);
 
     }
 }
