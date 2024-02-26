@@ -1,2 +1,11 @@
-package com.jpg6.gulimall.auth.vo;public class UserLoginVo {
+package com.jpg6.gulimall.auth.vo;
+
+import lombok.Data;
+
+@Data
+public class UserLoginVo {
+
+    private String loginacct;
+
+    private String password;
 }
