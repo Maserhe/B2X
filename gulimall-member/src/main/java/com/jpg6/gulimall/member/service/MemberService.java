@@ -5,6 +5,7 @@ import com.jpg6.common.utils.PageUtils;
 import com.jpg6.gulimall.member.entity.MemberEntity;
 import com.jpg6.gulimall.member.vo.MemberUserLoginVo;
 import com.jpg6.gulimall.member.vo.RegisterVo;
+import com.jpg6.gulimall.member.vo.SocialUser;
 
 import java.util.Map;
 
@@ -25,6 +26,25 @@ public interface MemberService extends IService<MemberEntity> {
 
     void checkUserNameUnique(String userName);
 
+    /**
+     * 用户登录
+     * @param vo
+     * @return
+     */
     MemberEntity login(MemberUserLoginVo vo);
+
+    /**
+     * 社交用户的登录
+     * @param socialUser
+     * @return
+     */
+    MemberEntity login(SocialUser socialUser) throws Exception;
+
+    /**
+     * 微信登录
+     * @param accessTokenInfo
+     * @return
+     */
+    MemberEntity login(String accessTokenInfo);
 }
 
