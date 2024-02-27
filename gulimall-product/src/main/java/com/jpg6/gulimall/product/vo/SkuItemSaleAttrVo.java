@@ -1,18 +1,18 @@
 package com.jpg6.gulimall.product.vo;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
 @Data
+@ToString
 public class SkuItemSaleAttrVo {
 
     private Long attrId;
-    /**
-     * 属性名
-     */
+
     private String attrName;
 
-    private List<String> attrValues;
+    private List<AttrValueWithSkuIdVo> attrValues;
 
 }
