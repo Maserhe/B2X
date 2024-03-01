@@ -60,28 +60,33 @@ public class CartServiceImpl implements CartService {
 
             //2、添加新的商品到购物车(redis)
             CartItemVo cartItemVo = new CartItemVo();
-            //开启第一个异步任务
-            CompletableFuture<Void> getSkuInfoFuture = CompletableFuture.runAsync(() -> {
-                //1、远程查询当前要添加商品的信息
-                R productSkuInfo = productFeignService.getInfo(skuId);
-                SkuInfoVo skuInfo = productSkuInfo.getData("skuInfo", new TypeReference<SkuInfoVo>() {});
-                //数据赋值操作
-                cartItemVo.setSkuId(skuInfo.getSkuId());
-                cartItemVo.setTitle(skuInfo.getSkuTitle());
-                cartItemVo.setImage(skuInfo.getSkuDefaultImg());
-                cartItemVo.setPrice(skuInfo.getPrice());
-                cartItemVo.setCount(num);
-            }, executor);
+//            //开启第一个异步任务
+//            CompletableFuture<Void> getSkuInfoFuture = CompletableFuture.runAsync(() -> {
+//
+//            }, executor);
+//
+//            //开启第二个异步任务
+//            CompletableFuture<Void> getSkuAttrValuesFuture = CompletableFuture.runAsync(() -> {
+//                //2、远程查询skuAttrValues组合信息
+//                List<String> skuSaleAttrValues = productFeignService.getSkuSaleAttrValues(skuId);
+//                cartItemVo.setSkuAttrValues(skuSaleAttrValues);
+//            }, executor);
+//
+//            //等待所有的异步任务全部完成
+//            // CompletableFuture.allOf(getSkuInfoFuture, getSkuAttrValuesFuture).get();
 
-            //开启第二个异步任务
-            CompletableFuture<Void> getSkuAttrValuesFuture = CompletableFuture.runAsync(() -> {
-                //2、远程查询skuAttrValues组合信息
-                List<String> skuSaleAttrValues = productFeignService.getSkuSaleAttrValues(skuId);
-                cartItemVo.setSkuAttrValues(skuSaleAttrValues);
-            }, executor);
+            //1、远程查询当前要添加商品的信息
+            R productSkuInfo = productFeignService.getInfo(skuId);
+            SkuInfoVo skuInfo = productSkuInfo.getData("skuInfo", new TypeReference<SkuInfoVo>() {});
+            //数据赋值操作
+            cartItemVo.setSkuId(skuInfo.getSkuId());
+            cartItemVo.setTitle(skuInfo.getSkuTitle());
+            cartItemVo.setImage(skuInfo.getSkuDefaultImg());
+            cartItemVo.setPrice(skuInfo.getPrice());
+            cartItemVo.setCount(num);
 
-            //等待所有的异步任务全部完成
-            CompletableFuture.allOf(getSkuInfoFuture, getSkuAttrValuesFuture).get();
+            List<String> skuSaleAttrValues = productFeignService.getSkuSaleAttrValues(skuId);
+            cartItemVo.setSkuAttrValues(skuSaleAttrValues);
 
             String cartItemJson = JSON.toJSONString(cartItemVo);
             cartOps.put(skuId.toString(), cartItemJson);

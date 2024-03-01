@@ -1,10 +1,14 @@
 package com.jpg6.gulimall.cart.vo;
 
 import lombok.Data;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
-public class SkuInfoVo {
+public class SkuInfoVo implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long skuId;
     /**
      * spuId

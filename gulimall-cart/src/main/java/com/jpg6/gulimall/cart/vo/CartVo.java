@@ -2,12 +2,13 @@ package com.jpg6.gulimall.cart.vo;
 
 import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
 
-public class CartVo {
-
+public class CartVo implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * 购物车子项信息
      */

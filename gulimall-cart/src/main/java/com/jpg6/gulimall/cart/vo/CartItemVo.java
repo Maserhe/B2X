@@ -1,10 +1,12 @@
 package com.jpg6.gulimall.cart.vo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class CartItemVo {
+public class CartItemVo implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private Long skuId;
 
     private Boolean check = true;

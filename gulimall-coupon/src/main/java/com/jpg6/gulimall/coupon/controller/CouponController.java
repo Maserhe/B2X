@@ -43,18 +43,18 @@ public class CouponController {
     }
 
 
-    @Value("${username}")
-    private String username;
-
-    @Value("${age}")
-    private String age;
-
-
-    @RequestMapping("/info")
-    public R getValue() {
-
-        return R.ok().put("username", username).put("age", age);
-    }
+//    @Value("${username}")
+//    private String username;
+//
+//    @Value("${age}")
+//    private String age;
+//
+//
+//    @RequestMapping("/info")
+//    public R getValue() {
+//
+//        return R.ok().put("username", username).put("age", age);
+//    }
 
 
     /**

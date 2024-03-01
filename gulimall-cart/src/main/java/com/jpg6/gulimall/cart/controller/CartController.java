@@ -1,7 +1,9 @@
 package com.jpg6.gulimall.cart.controller;
 
 
+import com.jpg6.gulimall.cart.interceptor.CartInterceptor;
 import com.jpg6.gulimall.cart.service.CartService;
+import com.jpg6.gulimall.cart.to.UserInfoTo;
 import com.jpg6.gulimall.cart.vo.CartItemVo;
 import com.jpg6.gulimall.cart.vo.CartVo;
 import org.springframework.stereotype.Controller;
@@ -52,7 +54,7 @@ public class CartController {
     @GetMapping(value = "/cart.html")
     public String cartListPage(Model model) throws ExecutionException, InterruptedException {
         //快速得到用户信息：id,user-key
-        // UserInfoTo userInfoTo = CartInterceptor.toThreadLocal.get();
+        UserInfoTo userInfoTo = CartInterceptor.toThreadLocal.get();
 
         CartVo cartVo = cartService.getCart();
         model.addAttribute("cart",cartVo);
