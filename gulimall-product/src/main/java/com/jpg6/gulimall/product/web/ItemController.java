@@ -21,6 +21,6 @@ public class ItemController {
     public String skuItem(@PathVariable Long skuId, Model model) throws ExecutionException, InterruptedException {
         SkuItemVo itemVo = skuInfoService.item(skuId);
         model.addAttribute("item", itemVo);
-        return "oldItem";
+        return "item";
     }
 }

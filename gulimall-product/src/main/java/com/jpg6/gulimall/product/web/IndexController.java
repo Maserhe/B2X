@@ -35,7 +35,7 @@ public class IndexController {
         List<CategoryEntity> categoryEntities = categoryService.getLevel1Categorys();
 
         model.addAttribute("categorys", categoryEntities);
-        return "oldIndex";
+        return "index";
     }
 
     @ResponseBody

@@ -68,7 +68,7 @@ public class CartController {
      * attributes.addAttribute():将数据放在url后面
      * @return
      */
-    @GetMapping(value = "/addCartItem")
+    @GetMapping(value = "/addToCart")
     public String addCartItem(@RequestParam("skuId") Long skuId,
                               @RequestParam("num") Integer num,
                               RedirectAttributes attributes) throws ExecutionException, InterruptedException {
