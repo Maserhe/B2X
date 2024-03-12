@@ -1,1 +1,1 @@
-# gulimall
+# B2X
